@@ -1,0 +1,21 @@
+{
+  "name": "plain",
+  "description": "Bold black text on white with a thin border",
+  "font": "oswald",
+  "palette": "mono",
+  "ink": "low",
+  "seasonal": false,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#111111",
+    "accent": "#111111"
+  },
+  "border": {
+    "enabled": true,
+    "color": "#111111",
+    "widthPt": 3,
+    "insetPt": 18,
+    "style": "single"
+  },
+  "decorations": []
+}

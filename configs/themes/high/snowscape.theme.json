@@ -1,0 +1,19 @@
+{
+  "name": "snowscape",
+  "description": "Christmas — full photo background (snowy scene) with a dark scrim for legible text",
+  "font": "mountains-of-christmas",
+  "palette": "colour",
+  "ink": "high",
+  "seasonal": true,
+  "colors": {
+    "background": "#0D1B3E",
+    "text": "#FFF7E6",
+    "accent": "#E8B923"
+  },
+  "image": {
+    "file": "snowscape.png",
+    "placement": "background",
+    "scrim": 0.32
+  },
+  "decorations": []
+}

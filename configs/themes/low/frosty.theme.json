@@ -1,0 +1,18 @@
+{
+  "name": "frosty",
+  "description": "Christmas — low-ink: blue outlines, snowflakes, a little tree and lights",
+  "font": "mountains-of-christmas",
+  "palette": "colour",
+  "ink": "low",
+  "seasonal": true,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#0D1B3E",
+    "accent": "#2E6FB5"
+  },
+  "decorations": [
+    { "type": "fairy-lights", "position": "top" },
+    { "type": "snow", "position": "corners", "color": "#2E6FB5" },
+    { "type": "tree", "position": "bottom", "color": "#2E6FB5" }
+  ]
+}

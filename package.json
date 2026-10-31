@@ -1,0 +1,34 @@
+{
+  "name": "shop-sign-creator",
+  "version": "0.1.0",
+  "description": "CLI that turns a notice message into a printable A4 PDF sign by combining a template (layout) with a theme (look).",
+  "license": "MIT",
+  "author": "Colm Bhandal",
+  "type": "module",
+  "bin": {
+    "sign": "dist/sign.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/build.mjs",
+    "dev": "tsx src/cli.ts",
+    "test": "tsx --test test/*.test.ts",
+    "vendor:fonts": "node scripts/vendor-fonts.mjs",
+    "package:win": "node scripts/package-win.mjs"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@expo-google-fonts/mountains-of-christmas": "^0.4.1",
+    "@expo-google-fonts/oswald": "^0.4.2",
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

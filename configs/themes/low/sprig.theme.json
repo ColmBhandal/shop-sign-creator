@@ -1,0 +1,18 @@
+{
+  "name": "sprig",
+  "description": "Christmas — low-ink: a small holly sprig photo at the foot of the sign",
+  "font": "oswald",
+  "palette": "colour",
+  "ink": "low",
+  "seasonal": true,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#1A1A1A",
+    "accent": "#C8102E"
+  },
+  "image": {
+    "file": "sprig.png",
+    "placement": "footer"
+  },
+  "decorations": []
+}

@@ -1,0 +1,24 @@
+{
+  "name": "festive",
+  "description": "Christmas — cream text on deep green, red double border, holly corners",
+  "font": "mountains-of-christmas",
+  "palette": "colour",
+  "ink": "high",
+  "seasonal": true,
+  "colors": {
+    "background": "#0B5D2E",
+    "text": "#FFF7E6",
+    "accent": "#C8102E"
+  },
+  "border": {
+    "enabled": true,
+    "color": "#C8102E",
+    "widthPt": 6,
+    "insetPt": 20,
+    "style": "double"
+  },
+  "decorations": [
+    { "type": "holly", "position": "corners" },
+    { "type": "fairy-lights", "position": "top" }
+  ]
+}

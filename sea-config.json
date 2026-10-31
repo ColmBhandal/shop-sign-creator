@@ -1,0 +1,12 @@
+{
+  "main": "dist/sign.cjs",
+  "output": "dist/sea-prep.blob",
+  "disableExperimentalSEAWarning": true,
+  "useSnapshot": false,
+  "useCodeCache": false,
+  "assets": {
+    "defaults.json": "dist/defaults.json",
+    "Oswald-Bold.ttf": "assets/fonts/Oswald-Bold.ttf",
+    "MountainsOfChristmas-Bold.ttf": "assets/fonts/MountainsOfChristmas-Bold.ttf"
+  }
+}

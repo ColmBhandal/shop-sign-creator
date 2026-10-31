@@ -1,0 +1,25 @@
+{
+  "name": "sketch",
+  "description": "Christmas — low-ink line art: outlined holly, baubles and fairy lights",
+  "font": "oswald",
+  "palette": "colour",
+  "ink": "low",
+  "seasonal": true,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#1A1A1A",
+    "accent": "#1E8C3A"
+  },
+  "border": {
+    "enabled": true,
+    "color": "#1A1A1A",
+    "widthPt": 2,
+    "insetPt": 18,
+    "style": "single"
+  },
+  "decorations": [
+    { "type": "fairy-lights", "position": "top" },
+    { "type": "holly", "position": "corners" },
+    { "type": "bauble", "position": "bottom" }
+  ]
+}

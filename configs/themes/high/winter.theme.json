@@ -1,0 +1,24 @@
+{
+  "name": "winter",
+  "description": "Christmas — white text on midnight blue, silver border, snowflake corners",
+  "font": "oswald",
+  "palette": "colour",
+  "ink": "high",
+  "seasonal": true,
+  "colors": {
+    "background": "#0D1B3E",
+    "text": "#FFFFFF",
+    "accent": "#AFC7E8"
+  },
+  "border": {
+    "enabled": true,
+    "color": "#AFC7E8",
+    "widthPt": 4,
+    "insetPt": 20,
+    "style": "single"
+  },
+  "decorations": [
+    { "type": "snow", "position": "corners" },
+    { "type": "bauble", "position": "top" }
+  ]
+}

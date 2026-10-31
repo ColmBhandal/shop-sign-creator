@@ -1,0 +1,18 @@
+{
+  "name": "garland",
+  "description": "Christmas — white sign with a photo garland band across the bottom",
+  "font": "oswald",
+  "palette": "colour",
+  "ink": "medium",
+  "seasonal": true,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#0B5D2E",
+    "accent": "#C8102E"
+  },
+  "image": {
+    "file": "garland.png",
+    "placement": "band-bottom"
+  },
+  "decorations": []
+}

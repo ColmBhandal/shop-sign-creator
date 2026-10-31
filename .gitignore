@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Packaged standalone executable (release artifact only — never committed)
+dist-win/
+*.exe
+*.blob
+
+# Generated signs
+output/
+
+# OS / editor
+Thumbs.db
+.DS_Store
+*.log
+
+# AI assistant files (Claude, Cursor, Copilot, ChatGPT/Codex, and friends)
+.claude/
+CLAUDE.md
+.claude.json
+.mcp.json
+.omc/
+.cursor/
+.cursorrules
+.cursorignore
+.github/copilot-instructions.md
+.copilot/
+.codex/
+.chatgpt/
+.openai/
+AGENTS.md
+.aider*
+.continue/
+.windsurf/
+.windsurfrules
+.gemini/
+GEMINI.md
+.ai/

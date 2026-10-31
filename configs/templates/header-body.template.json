@@ -1,0 +1,28 @@
+{
+  "name": "header-body",
+  "description": "First line as a large header, remaining lines as the body below",
+  "margin": 0.07,
+  "regions": [
+    {
+      "id": "header",
+      "x": 0.0,
+      "y": 0.0,
+      "width": 1.0,
+      "height": 0.28,
+      "align": "center",
+      "valign": "middle",
+      "source": "first-line",
+      "maxLines": 1
+    },
+    {
+      "id": "body",
+      "x": 0.0,
+      "y": 0.34,
+      "width": 1.0,
+      "height": 0.66,
+      "align": "center",
+      "valign": "middle",
+      "source": "rest"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "trimmings",
+  "description": "Christmas — green text on white, holly, baubles and a santa hat",
+  "font": "oswald",
+  "palette": "colour",
+  "ink": "medium",
+  "seasonal": true,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#0B5D2E",
+    "accent": "#C8102E"
+  },
+  "border": {
+    "enabled": true,
+    "color": "#C8102E",
+    "widthPt": 4,
+    "insetPt": 20,
+    "style": "single"
+  },
+  "decorations": [
+    { "type": "santa-hat", "position": "top", "color": "#C8102E" },
+    { "type": "holly", "position": "corners" },
+    { "type": "bauble", "position": "bottom", "color": "#C8102E" }
+  ]
+}

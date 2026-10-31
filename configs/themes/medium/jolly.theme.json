@@ -1,0 +1,25 @@
+{
+  "name": "jolly",
+  "description": "Christmas — red text on white, green border, fairy lights and a tree",
+  "font": "mountains-of-christmas",
+  "palette": "colour",
+  "ink": "medium",
+  "seasonal": true,
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#C8102E",
+    "accent": "#1E8C3A"
+  },
+  "border": {
+    "enabled": true,
+    "color": "#1E8C3A",
+    "widthPt": 5,
+    "insetPt": 20,
+    "style": "single"
+  },
+  "decorations": [
+    { "type": "fairy-lights", "position": "top" },
+    { "type": "bauble", "position": "corners", "color": "#C8102E" },
+    { "type": "tree", "position": "bottom", "color": "#1E8C3A" }
+  ]
+}
