@@ -1,0 +1,28 @@
+{
+  "name": "header2-body-left",
+  "description": "First two lines as a large left-aligned header, remaining lines as a left-aligned body",
+  "margin": 0.07,
+  "regions": [
+    {
+      "id": "header",
+      "x": 0.0,
+      "y": 0.0,
+      "width": 1.0,
+      "height": 0.28,
+      "align": "left",
+      "valign": "middle",
+      "fromLine": 0,
+      "toLine": 2
+    },
+    {
+      "id": "body",
+      "x": 0.0,
+      "y": 0.34,
+      "width": 1.0,
+      "height": 0.66,
+      "align": "left",
+      "valign": "top",
+      "fromLine": 2
+    }
+  ]
+}

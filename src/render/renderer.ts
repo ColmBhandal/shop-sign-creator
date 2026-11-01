@@ -12,16 +12,23 @@ import {
   type RGB,
 } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
-import type { RenderOptions, TemplateRegion, Theme, ThemeImage } from "../types.js";
+import type { HoursSignOptions, RenderOptions, TemplateRegion, Theme, ThemeImage } from "../types.js";
 import { getFontBytes, getImageBytes } from "../assets.js";
 
 const LINE_GAP = 1.15; // line height as a multiple of font size
 const MIN_FONT = 4;
 const MAX_FONT = 1000;
 
-export async function renderSign(opts: RenderOptions): Promise<Uint8Array> {
-  const { template, theme, paper, lines } = opts;
+interface PageSetup {
+  doc: PDFDoc;
+  page: PDFPage;
+  font: PDFFont;
+  /** Printable area left for text after margins and any image. */
+  area: Rect;
+}
 
+/** Create the page and draw everything beneath the text: background, image, border, decorations. */
+async function beginPage(theme: Theme, marginFraction: number | undefined, paper: RenderOptions["paper"]): Promise<PageSetup> {
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
   const font = await doc.embedFont(getFontBytes(theme.font), { subset: true });
@@ -33,8 +40,8 @@ export async function renderSign(opts: RenderOptions): Promise<Uint8Array> {
   // Background fill
   page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: hex(theme.colors.background) });
 
-  // Printable area inside the template margin (fraction of the shorter edge).
-  const margin = (template.margin ?? 0.06) * Math.min(W, H);
+  // Printable area inside the margin (fraction of the shorter edge).
+  const margin = (marginFraction ?? 0.06) * Math.min(W, H);
   let area: Rect = { x: margin, y: margin, w: W - 2 * margin, h: H - 2 * margin };
 
   // Optional raster image (photo). May shrink the text area for bands/footers.
@@ -45,6 +52,53 @@ export async function renderSign(opts: RenderOptions): Promise<Uint8Array> {
   // Border + decorations
   if (theme.border?.enabled) drawBorder(page, W, H, theme);
   drawDecorations(page, W, H, theme);
+
+  return { doc, page, font, area };
+}
+
+/** Opening-hours sign: business name, sub heading, then a two-column day/hours table in the lower half. */
+export async function renderHoursSign(opts: HoursSignOptions): Promise<Uint8Array> {
+  const { theme, paper, business, subheading, rows } = opts;
+  const { doc, page, font, area } = await beginPage(theme, 0.07, paper);
+  const color = hex(theme.colors.text);
+
+  const headerRegion: TemplateRegion = { id: "header", x: 0, y: 0, width: 1, height: 0.22, align: "center", valign: "middle" };
+  const subRegion: TemplateRegion = { id: "sub", x: 0, y: 0.24, width: 1, height: 0.09, align: "center", valign: "middle" };
+  drawRegion(page, font, [business], headerRegion, area, color);
+  drawRegion(page, font, [subheading], subRegion, area, color);
+
+  // Table: one shared font size, much smaller than the sub heading, so all rows fit.
+  const table = regionRect({ id: "table", x: 0, y: 0.5, width: 1, height: 0.5 }, area);
+  const subSize = fitFontSize(font, [subheading], regionRect(subRegion, area), 1);
+  const ROW_AIR = 1.25; // extra row spacing beyond the line height
+  const GAP = 0.02 * area.w; // breathing room between the two columns
+  // The page is split into two equal columns: days on the left, hours on the right.
+  const colW = area.w / 2;
+  const dayW = Math.max(...rows.map((r) => font.widthOfTextAtSize(r.day, 1)));
+  const hoursW = Math.max(...rows.map((r) => font.widthOfTextAtSize(r.hours, 1)));
+  const size = Math.max(
+    MIN_FONT,
+    Math.min(
+      (colW - GAP) / dayW,
+      (colW - GAP) / hoursW,
+      table.h / (rows.length * LINE_GAP * ROW_AIR),
+      subSize * 0.6,
+    ),
+  );
+  const pitch = size * LINE_GAP * ROW_AIR;
+  const hoursX = area.x + colW;
+  rows.forEach((r, i) => {
+    const baseline = table.y + table.h - i * pitch - size;
+    page.drawText(r.day, { x: area.x, y: baseline, size, font, color });
+    page.drawText(r.hours, { x: hoursX, y: baseline, size, font, color });
+  });
+
+  return doc.save();
+}
+
+export async function renderSign(opts: RenderOptions): Promise<Uint8Array> {
+  const { template, theme, paper, lines } = opts;
+  const { doc, page, font, area } = await beginPage(theme, template.margin, paper);
 
   const textColor = hex(theme.colors.text);
 
@@ -60,7 +114,9 @@ export async function renderSign(opts: RenderOptions): Promise<Uint8Array> {
 function selectLines(lines: string[], region: TemplateRegion): string[] {
   const source = region.source ?? "all";
   let selected: string[];
-  if (source === "first-line") selected = lines.slice(0, 1);
+  if (region.fromLine !== undefined || region.toLine !== undefined) {
+    selected = lines.slice(region.fromLine ?? 0, region.toLine);
+  } else if (source === "first-line") selected = lines.slice(0, 1);
   else if (source === "rest") selected = lines.slice(1);
   else selected = lines;
 

@@ -13,6 +13,8 @@ sign closed --template centered --theme festive --text "CLOSED\nBACK JANUARY 2ND
 
 That saves `output/closed.pdf`.
 
+- `sign hours <filename> --business "Name" --theme <theme> --hours-file hours.txt` — make an opening-hours sign: business name as a large header, an "Opening Hours" sub heading, then a day/hours table. Put one `Day: hours` per line in the file (or use `--hours "Monday: 9-5
+Tuesday: CLOSED"`). Change the sub heading with `--subheading`.
 - `sign list` — see the templates and themes you can choose from.
 - `sign --help` — see all the options.
 

@@ -87,6 +87,10 @@ export function parseTemplate(raw: unknown): Template {
     }
     const maxLines = optNum(ro, "maxLines", rwhere);
     if (maxLines !== undefined) region.maxLines = maxLines;
+    const fromLine = optNum(ro, "fromLine", rwhere);
+    if (fromLine !== undefined) region.fromLine = fromLine;
+    const toLine = optNum(ro, "toLine", rwhere);
+    if (toLine !== undefined) region.toLine = toLine;
     const scale = optNum(ro, "scale", rwhere);
     if (scale !== undefined) region.scale = scale;
     return region;

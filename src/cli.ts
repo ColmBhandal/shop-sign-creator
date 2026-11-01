@@ -1,6 +1,7 @@
 // Shop sign creator CLI.
 //   sign <filename> --template <t> --theme <y> (--text "..." | --file notice.txt)
 //                   [--out <dir>] [--paper A4] [--overwrite] [--config-dir <dir>]
+//   sign hours <filename> --business "Name" --theme <y> (--hours "Monday: 9-5, ..." | --hours-file hours.txt)
 //   sign list
 //   sign --help
 
@@ -10,8 +11,9 @@ import { loadConfigSet } from "./config/discovery.js";
 import { imageExists } from "./assets.js";
 import { resolvePaper, DEFAULT_PAPER, PAPER_SIZES } from "./paper.js";
 import { linesFromText, linesFromFile } from "./text.js";
-import { renderSign } from "./render/renderer.js";
-import type { Theme } from "./types.js";
+import { parseHours } from "./hours.js";
+import { renderSign, renderHoursSign } from "./render/renderer.js";
+import type { ConfigSet, PaperSize, Theme } from "./types.js";
 
 class UserError extends Error {}
 
@@ -21,7 +23,7 @@ interface Args {
   bools: Set<string>;
 }
 
-const VALUE_FLAGS = new Set(["template", "theme", "text", "file", "out", "paper", "config-dir", "ink"]);
+const VALUE_FLAGS = new Set(["template", "theme", "text", "file", "out", "paper", "config-dir", "ink", "business", "hours", "hours-file", "subheading"]);
 const INK_LEVELS = new Set(["high", "medium", "low"]);
 const BOOL_FLAGS = new Set(["overwrite", "help", "version"]);
 
@@ -67,6 +69,7 @@ const HELP = `shop sign creator — make a printable PDF notice sign
 
 Usage:
   sign <filename> --template <name> --theme <name> (--text "MESSAGE" | --file notice.txt) [options]
+  sign hours <filename> --business "NAME" --theme <name> (--hours "DAY: HOURS\\n..." | --hours-file hours.txt) [options]
   sign list
   sign --help
 
@@ -79,6 +82,10 @@ Options:
   --paper <size>      Paper size: ${Object.keys(PAPER_SIZES).join(", ")} (default: ${DEFAULT_PAPER})
   --ink <level>       high | medium | low. Filters 'sign list'; on a sign, asserts the
                       chosen theme uses that ink level (handy to keep printing cheap)
+  --business "NAME"   (hours) Business name, shown as the large header
+  --hours "..."       (hours) One "Day: hours" per line; use \\n between lines
+  --hours-file <path> (hours) Read the opening hours from a plain-text file
+  --subheading "..."  (hours) Line under the name (default: "Opening Hours")
   --overwrite         Overwrite the output file if it already exists
   --config-dir <dir>  Extra directory of custom templates/themes
   -h, --help          Show this help
@@ -86,6 +93,7 @@ Options:
 Examples:
   sign closed --template centered --theme festive --text "CLOSED\\nBACK JANUARY 2ND"
   sign notice --template header-body --theme plain --file message.txt --paper A4
+  sign hours opening-times --business "Vapourpal" --theme frame-medium --hours-file hours.txt
 `;
 
 function runList(configDir?: string, inkFilter?: string): void {
@@ -134,6 +142,8 @@ async function run(argv: string[]): Promise<number> {
     return 0;
   }
 
+  if (args.positional[0] === "hours") return runHours(args, ink);
+
   const filenameArg = args.positional[0];
   if (!filenameArg) throw new UserError("An output filename is required. See: sign --help");
 
@@ -152,23 +162,7 @@ async function run(argv: string[]): Promise<number> {
   if (!template) {
     throw new UserError(`Unknown template "${templateName}". Available: ${[...templates.keys()].join(", ")}`);
   }
-  const theme = themes.get(themeName);
-  if (!theme) {
-    throw new UserError(`Unknown theme "${themeName}". Available: ${[...themes.keys()].join(", ")}`);
-  }
-  if (ink !== undefined && (theme.ink ?? "medium") !== ink) {
-    throw new UserError(
-      `Theme "${theme.name}" is ${theme.ink ?? "medium"} ink, but --ink ${ink} was requested. ` +
-        `See low-ink options with: sign list --ink ${ink}`,
-    );
-  }
-
-  if (theme.image && !imageExists(theme.image.file)) {
-    throw new UserError(
-      `Theme "${theme.name}" needs the image "${theme.image.file}". ` +
-        `Add it under assets/images/ (or beside the executable) and try again.`,
-    );
-  }
+  const theme = pickTheme(themes, themeName, ink);
 
   const paper = resolvePaper(args.flags.paper ?? DEFAULT_PAPER);
 
@@ -181,21 +175,104 @@ async function run(argv: string[]): Promise<number> {
   }
   if (lines.length === 0) throw new UserError("The notice text is empty");
 
-  // Resolve output path.
-  const outDir = args.flags.out ?? join(process.cwd(), "output");
-  const fileName = extname(filenameArg) ? filenameArg : `${filenameArg}.pdf`;
-  const outPath = resolve(outDir, fileName);
-
-  if (existsSync(outPath) && !args.bools.has("overwrite")) {
-    console.error(`Warning: ${outPath} already exists. Re-run with --overwrite to replace it.`);
-    return 1;
-  }
+  const target = outputTarget(args, filenameArg);
+  if (!target) return 1;
 
   const pdf = await renderSign({ template, theme, paper, lines });
 
-  mkdirSync(outDir, { recursive: true });
-  writeFileSync(outPath, pdf);
+  const outPath = writePdf(target, pdf);
   console.log(`Created ${outPath}  (${template.name} / ${theme.name}, ${paper.name}, ${lines.length} line${lines.length === 1 ? "" : "s"})`);
+  return 0;
+}
+
+/** Look up a theme and check it is usable (known, matches --ink, image present). */
+function pickTheme(themes: ConfigSet["themes"], themeName: string, ink: string | undefined): Theme {
+  const theme = themes.get(themeName);
+  if (!theme) {
+    throw new UserError(`Unknown theme "${themeName}". Available: ${[...themes.keys()].join(", ")}`);
+  }
+  if (ink !== undefined && (theme.ink ?? "medium") !== ink) {
+    throw new UserError(
+      `Theme "${theme.name}" is ${theme.ink ?? "medium"} ink, but --ink ${ink} was requested. ` +
+        `See low-ink options with: sign list --ink ${ink}`,
+    );
+  }
+  if (theme.image && !imageExists(theme.image.file)) {
+    throw new UserError(
+      `Theme "${theme.name}" needs the image "${theme.image.file}". ` +
+        `Add it under assets/images/ (or beside the executable) and try again.`,
+    );
+  }
+  return theme;
+}
+
+interface OutputTarget {
+  outDir: string;
+  outPath: string;
+}
+
+/** Resolve the output path; null (after warning) if it exists and --overwrite wasn't given. */
+function outputTarget(args: Args, filenameArg: string): OutputTarget | null {
+  const outDir = args.flags.out ?? join(process.cwd(), "output");
+  const fileName = extname(filenameArg) ? filenameArg : `${filenameArg}.pdf`;
+  const outPath = resolve(outDir, fileName);
+  if (existsSync(outPath) && !args.bools.has("overwrite")) {
+    console.error(`Warning: ${outPath} already exists. Re-run with --overwrite to replace it.`);
+    return null;
+  }
+  return { outDir, outPath };
+}
+
+function writePdf(target: OutputTarget, pdf: Uint8Array): string {
+  mkdirSync(target.outDir, { recursive: true });
+  writeFileSync(target.outPath, pdf);
+  return target.outPath;
+}
+
+async function runHours(args: Args, ink: string | undefined): Promise<number> {
+  const filenameArg = args.positional[1];
+  if (!filenameArg) throw new UserError("An output filename is required. See: sign --help");
+  const business = required(args.flags, "business").trim();
+  const themeName = required(args.flags, "theme");
+
+  if (!args.flags.hours && !args.flags["hours-file"]) {
+    throw new UserError("Provide the opening hours with --hours or --hours-file");
+  }
+  if (args.flags.hours && args.flags["hours-file"]) {
+    throw new UserError("Use only one of --hours or --hours-file, not both");
+  }
+
+  const { themes } = loadConfigSet({ explicitDir: args.flags["config-dir"] });
+  const theme = pickTheme(themes, themeName, ink);
+  const paper: PaperSize = resolvePaper(args.flags.paper ?? DEFAULT_PAPER);
+
+  let lines: string[];
+  if (args.flags["hours-file"]) {
+    if (!existsSync(args.flags["hours-file"])) throw new UserError(`Hours file not found: ${args.flags["hours-file"]}`);
+    lines = linesFromFile(args.flags["hours-file"]);
+  } else {
+    lines = linesFromText(args.flags.hours!);
+  }
+  if (lines.length === 0) throw new UserError("The opening hours are empty");
+  let rows;
+  try {
+    rows = parseHours(lines);
+  } catch (e) {
+    throw new UserError(e instanceof Error ? e.message : String(e));
+  }
+
+  const target = outputTarget(args, filenameArg);
+  if (!target) return 1;
+
+  const pdf = await renderHoursSign({
+    theme,
+    paper,
+    business,
+    subheading: args.flags.subheading?.trim() || "Opening Hours",
+    rows,
+  });
+  const outPath = writePdf(target, pdf);
+  console.log(`Created ${outPath}  (opening hours / ${theme.name}, ${paper.name}, ${rows.length} day${rows.length === 1 ? "" : "s"})`);
   return 0;
 }
 

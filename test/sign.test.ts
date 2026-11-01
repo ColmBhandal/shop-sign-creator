@@ -4,7 +4,8 @@ import { loadConfigSet } from "../src/config/discovery.js";
 import { parseTemplate, parseTheme, ConfigError } from "../src/config/schema.js";
 import { resolvePaper, PAPER_SIZES } from "../src/paper.js";
 import { linesFromText } from "../src/text.js";
-import { renderSign } from "../src/render/renderer.js";
+import { renderSign, renderHoursSign } from "../src/render/renderer.js";
+import { parseHours } from "../src/hours.js";
 import { imageExists } from "../src/assets.js";
 
 test("default config set has the expected templates and themes", () => {
@@ -97,4 +98,27 @@ test("renderSign works on a non-A4 paper size (A3)", async () => {
     lines: ["SALE"],
   });
   assert.equal(Buffer.from(pdf.slice(0, 5)).toString("latin1"), "%PDF-");
+});
+
+test("parseHours splits day and hours at the first colon", () => {
+  assert.deepEqual(parseHours(["Monday: 09:00-17:30", "Sunday: CLOSED"]), [
+    { day: "Monday", hours: "09:00-17:30" },
+    { day: "Sunday", hours: "CLOSED" },
+  ]);
+  assert.throws(() => parseHours(["Monday 9-5"]));
+});
+
+test("renderHoursSign produces a PDF for every theme", async () => {
+  const { themes } = loadConfigSet();
+  for (const theme of themes.values()) {
+    if (theme.image && !imageExists(theme.image.file)) continue;
+    const pdf = await renderHoursSign({
+      theme,
+      paper: PAPER_SIZES.A4,
+      business: "Test Shop",
+      subheading: "Opening Hours",
+      rows: parseHours(["Monday: 9-5", "Tuesday: CLOSED (open bank holidays)"]),
+    });
+    assert.equal(Buffer.from(pdf.slice(0, 5)).toString("latin1"), "%PDF-", `${theme.name} should be a PDF`);
+  }
 });

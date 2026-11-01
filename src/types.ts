@@ -23,6 +23,9 @@ export interface TemplateRegion {
   source?: TextSource;
   /** Hard cap on lines for this region (e.g. a single-line header). */
   maxLines?: number;
+  /** Narrow the region to notice lines [fromLine, toLine) (0-based; toLine omitted = to the end). Overrides "source". */
+  fromLine?: number;
+  toLine?: number;
   /** Multiplier on the auto-fit font size for this region (e.g. header bigger). Default 1. */
   scale?: number;
 }
@@ -130,4 +133,19 @@ export interface RenderOptions {
   paper: PaperSize;
   /** Notice text, already split into lines. */
   lines: string[];
+}
+
+/** One opening-hours row: a day label and its hours text. */
+export interface HoursRow {
+  day: string;
+  hours: string;
+}
+
+export interface HoursSignOptions {
+  theme: Theme;
+  paper: PaperSize;
+  business: string;
+  /** Smaller line under the business name, e.g. "Opening Hours". */
+  subheading: string;
+  rows: HoursRow[];
 }

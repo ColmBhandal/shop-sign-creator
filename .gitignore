@@ -39,3 +39,6 @@ AGENTS.md
 .gemini/
 GEMINI.md
 .ai/
+
+# Sign text inputs
+inputs/
