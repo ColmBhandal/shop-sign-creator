@@ -17,6 +17,8 @@ const req = createRequire(import.meta.url || process.execPath);
 export const FONT_REGISTRY: Record<string, string> = {
   oswald: "Oswald-Bold.ttf",
   "mountains-of-christmas": "MountainsOfChristmas-Bold.ttf",
+  // Stand-in approximating Vapourpal's Nunito for the frame themes; point at a Nunito TTF to swap.
+  "cool-blue": "Oswald-Bold.ttf",
 };
 
 interface SeaApi {

@@ -6,6 +6,12 @@ executable). Drop a PNG or JPG here with the filename the theme expects.
 | Theme | File | Placement | Suggested image |
 | --- | --- | --- | --- |
 | `snowscape` | `snowscape.png` | full background | Portrait (~2:3) festive scene, calm centre for text |
+| `frame-high` | `frame-high.png` | full background + `safeArea` | Dark frame/panel (2048×3072) |
+| `frame-medium` | `frame-medium.png` | full background + `safeArea` | White panel, dark frame |
+| `frame-low` | `frame-low.png` | full background + `safeArea` | White panel, pale frame |
+
+Optional `image.safeArea` (`top/right/bottom/left`, page fractions) confines text to a panel
+baked into a background image.
 
 Guidelines for new images:
 - Portrait, roughly A4 proportions (about 2:3). ~1024×1536 is fine for a sign.

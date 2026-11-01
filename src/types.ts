@@ -81,6 +81,11 @@ export interface ThemeImage {
   placement: ImagePlacement;
   /** For "background": opacity (0..1) of a dark scrim over the image for text legibility. */
   scrim?: number;
+  /**
+   * For "background": text area as page-fraction insets (0..1) from each edge, so text stays
+   * inside a frame/panel baked into the image. Replaces the template margin when set.
+   */
+  safeArea?: { top: number; right: number; bottom: number; left: number };
 }
 
 /** Theme = look only (font, colours, border, decorations). */

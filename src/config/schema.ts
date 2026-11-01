@@ -179,6 +179,18 @@ export function parseTheme(raw: unknown): Theme {
       if (scrim < 0 || scrim > 1) throw new ConfigError(`${where}: image "scrim" must be 0..1`);
       theme.image.scrim = scrim;
     }
+    if (im.safeArea !== undefined) {
+      const sa = im.safeArea as Record<string, unknown>;
+      if (typeof sa !== "object" || sa === null) {
+        throw new ConfigError(`${where}: image "safeArea" must be an object`);
+      }
+      const side = (k: string): number => {
+        const v = num(sa, k, `${where} image safeArea`);
+        if (v < 0 || v >= 0.5) throw new ConfigError(`${where}: image safeArea "${k}" must be 0..0.5`);
+        return v;
+      };
+      theme.image.safeArea = { top: side("top"), right: side("right"), bottom: side("bottom"), left: side("left") };
+    }
   }
 
   // Accept either a single `decoration` object (legacy) or a `decorations` array.

@@ -1,0 +1,19 @@
+{
+  "name": "frame-medium",
+  "description": "Framed sign — white panel inside a dark blue-accented frame (medium ink)",
+  "font": "cool-blue",
+  "palette": "colour",
+  "ink": "medium",
+  "colors": {
+    "background": "#FFFFFF",
+    "text": "#1A1A1A",
+    "accent": "#1496CB"
+  },
+  "image": {
+    "file": "frame-medium.png",
+    "placement": "background",
+    "scrim": 0,
+    "safeArea": { "top": 0.08, "right": 0.1, "bottom": 0.12, "left": 0.1 }
+  },
+  "decorations": []
+}

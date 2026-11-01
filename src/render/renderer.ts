@@ -176,6 +176,10 @@ async function placeImage(
       if (op > 0) {
         page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: rgb(0, 0, 0), opacity: op });
       }
+      const sa = image.safeArea;
+      if (sa) {
+        return { x: sa.left * W, y: sa.bottom * H, w: (1 - sa.left - sa.right) * W, h: (1 - sa.top - sa.bottom) * H };
+      }
       return area;
     }
     case "band-bottom": {

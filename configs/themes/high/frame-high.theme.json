@@ -1,0 +1,19 @@
+{
+  "name": "frame-high",
+  "description": "Framed sign — dark panel with blue accents (high ink)",
+  "font": "cool-blue",
+  "palette": "colour",
+  "ink": "high",
+  "colors": {
+    "background": "#2D3133",
+    "text": "#FFFFFF",
+    "accent": "#1496CB"
+  },
+  "image": {
+    "file": "frame-high.png",
+    "placement": "background",
+    "scrim": 0,
+    "safeArea": { "top": 0.08, "right": 0.1, "bottom": 0.12, "left": 0.1 }
+  },
+  "decorations": []
+}
